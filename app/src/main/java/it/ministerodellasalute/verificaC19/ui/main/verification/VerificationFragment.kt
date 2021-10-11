@@ -42,8 +42,8 @@ import it.ministerodellasalute.verificaC19.databinding.FragmentVerificationBindi
 import it.ministerodellasalute.verificaC19.ui.FirstActivity
 import it.ministerodellasalute.verificaC19.ui.compounds.QuestionCompound
 import it.ministerodellasalute.verificaC19.ui.main.MainActivity
-import it.ministerodellasalute.verificaC19sdk.VerificaMinSDKVersionException
-import it.ministerodellasalute.verificaC19sdk.VerificaMinVersionException
+// import it.ministerodellasalute.verificaC19sdk.VerificaMinSDKVersionException
+// import it.ministerodellasalute.verificaC19sdk.VerificaMinVersionException
 import it.ministerodellasalute.verificaC19sdk.model.CertificateSimple
 import it.ministerodellasalute.verificaC19sdk.model.CertificateStatus
 import it.ministerodellasalute.verificaC19sdk.model.SimplePersonModel
@@ -53,6 +53,7 @@ import it.ministerodellasalute.verificaC19sdk.util.FORMATTED_VALIDATION_DATE
 import it.ministerodellasalute.verificaC19sdk.util.TimeUtility.parseFromTo
 import it.ministerodellasalute.verificaC19sdk.util.TimeUtility.parseTo
 import it.ministerodellasalute.verificaC19sdk.util.YEAR_MONTH_DAY
+import java.util.*
 
 @ExperimentalUnsignedTypes
 @AndroidEntryPoint
@@ -87,25 +88,25 @@ class VerificationFragment : Fragment(), View.OnClickListener {
         viewModel.inProgress.observe(viewLifecycleOwner) {
             binding.progressBar.isVisible = it
         }
-        try {
-            viewModel.init(args.qrCodeText, true)
-        }
-        catch (e: VerificaMinSDKVersionException)
-        {
-            Log.d("VerificationFragment", "Min SDK Version Exception")
-            createForceUpdateDialog()
-        }
-        catch (e: VerificaMinVersionException)
-        {
-            Log.d("VerificationFragment", "Min App Version Exception")
-            createForceUpdateDialog()
-        }
+        // try {
+            viewModel.init(args.qrCodeText)
+        // }
+        // catch (e: VerificaMinSDKVersionException)
+        // {
+        //    Log.d("VerificationFragment", "Min SDK Version Exception")
+        //    createForceUpdateDialog()
+        // }
+        // catch (e: VerificaMinVersionException)
+        // {
+        //    Log.d("VerificationFragment", "Min App Version Exception")
+        //    createForceUpdateDialog()
+        // }
 
     }
 
     private fun setupCertStatusView(cert: CertificateSimple) {
-        //val certStatus = viewModel.getCertificateStatus(cert)
-        val certStatus = cert.certificateStatus
+        val certStatus = viewModel.getCertificateStatus(cert)
+        // val certStatus = cert.certificateStatus
         if (certStatus !=null) {
             setBackgroundColor(certStatus)
             setPersonDetailsVisibility(certStatus)
@@ -119,7 +120,7 @@ class VerificationFragment : Fragment(), View.OnClickListener {
 
     private fun setupTimeStamp(cert: CertificateSimple) {
         binding.validationDate.text = getString(
-            R.string.label_validation_timestamp, cert.timeStamp?.parseTo(
+            R.string.label_validation_timestamp, Date().time.parseTo(
                 FORMATTED_VALIDATION_DATE
             )
         )
@@ -131,7 +132,7 @@ class VerificationFragment : Fragment(), View.OnClickListener {
             CertificateStatus.VALID, CertificateStatus.PARTIALLY_VALID -> mapOf(getString(R.string.label_what_can_be_done) to "https://www.dgc.gov.it/web/faq.html#verifica19")
             CertificateStatus.NOT_VALID_YET -> mapOf(getString(R.string.label_when_qr_valid) to "https://www.dgc.gov.it/web/faq.html#verifica19")
             CertificateStatus.NOT_VALID -> mapOf(getString(R.string.label_why_qr_not_valid) to "https://www.dgc.gov.it/web/faq.html#verifica19")
-            CertificateStatus.NOT_EU_DCC -> mapOf(getString(R.string.label_which_qr_scan) to "https://www.dgc.gov.it/web/faq.html#verifica19")
+            CertificateStatus.NOT_GREEN_PASS -> mapOf(getString(R.string.label_which_qr_scan) to "https://www.dgc.gov.it/web/faq.html#verifica19")
         }
         questionMap.map {
             val compound = QuestionCompound(context)
@@ -143,7 +144,7 @@ class VerificationFragment : Fragment(), View.OnClickListener {
 
     private fun setValidationSubTextVisibility(certStatus: CertificateStatus) {
         binding.subtitleText.visibility = when (certStatus) {
-            CertificateStatus.NOT_EU_DCC -> View.GONE
+            CertificateStatus.NOT_GREEN_PASS -> View.GONE
             else -> View.VISIBLE
         }
     }
@@ -161,7 +162,7 @@ class VerificationFragment : Fragment(), View.OnClickListener {
         binding.certificateValid.text = when (certStatus) {
             CertificateStatus.VALID -> getString(R.string.certificateValid)
             CertificateStatus.PARTIALLY_VALID -> getString(R.string.certificatePartiallyValid)
-            CertificateStatus.NOT_EU_DCC -> getString(R.string.certificateNotDCC)
+            CertificateStatus.NOT_GREEN_PASS -> getString(R.string.certificateNotDCC)
             CertificateStatus.NOT_VALID -> getString(R.string.certificateNonValid)
             CertificateStatus.NOT_VALID_YET -> getString(R.string.certificateNonValidYet)
         }
@@ -174,7 +175,7 @@ class VerificationFragment : Fragment(), View.OnClickListener {
                     CertificateStatus.VALID -> R.drawable.ic_valid_cert
                     CertificateStatus.NOT_VALID_YET -> R.drawable.ic_not_valid_yet
                     CertificateStatus.PARTIALLY_VALID -> R.drawable.ic_locally_valid
-                    CertificateStatus.NOT_EU_DCC -> R.drawable.ic_technical_error
+                    CertificateStatus.NOT_GREEN_PASS -> R.drawable.ic_technical_error
                     else -> R.drawable.ic_invalid
                 }
             )

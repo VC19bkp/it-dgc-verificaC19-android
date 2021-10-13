@@ -24,6 +24,7 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -42,8 +43,8 @@ import it.ministerodellasalute.verificaC19.databinding.FragmentVerificationBindi
 import it.ministerodellasalute.verificaC19.ui.FirstActivity
 import it.ministerodellasalute.verificaC19.ui.compounds.QuestionCompound
 import it.ministerodellasalute.verificaC19.ui.main.MainActivity
-// import it.ministerodellasalute.verificaC19sdk.VerificaMinSDKVersionException
-// import it.ministerodellasalute.verificaC19sdk.VerificaMinVersionException
+//import it.ministerodellasalute.verificaC19sdk.VerificaMinSDKVersionException
+//import it.ministerodellasalute.verificaC19sdk.VerificaMinVersionException
 import it.ministerodellasalute.verificaC19sdk.model.CertificateSimple
 import it.ministerodellasalute.verificaC19sdk.model.CertificateStatus
 import it.ministerodellasalute.verificaC19sdk.model.SimplePersonModel
@@ -83,30 +84,36 @@ class VerificationFragment : Fragment(), View.OnClickListener {
                 setPersonData(it.person, it.dateOfBirth)
                 setupCertStatusView(it)
                 setupTimeStamp(it)
+                //if (viewModel.getTotemMode() && (certificate.certificateStatus == CertificateStatus.VALID
+                //    || certificate.certificateStatus == CertificateStatus.PARTIALLY_VALID)) {
+                //    Handler().postDelayed({
+                //        activity?.onBackPressed()
+                //    }, 5000)
+                //}
             }
         }
         viewModel.inProgress.observe(viewLifecycleOwner) {
             binding.progressBar.isVisible = it
         }
-        // try {
+        //try {
             viewModel.init(args.qrCodeText)
-        // }
-        // catch (e: VerificaMinSDKVersionException)
-        // {
+        //}
+        //catch (e: VerificaMinSDKVersionException)
+        //{
         //    Log.d("VerificationFragment", "Min SDK Version Exception")
         //    createForceUpdateDialog()
-        // }
-        // catch (e: VerificaMinVersionException)
-        // {
+        //}
+        //catch (e: VerificaMinVersionException)
+        //{
         //    Log.d("VerificationFragment", "Min App Version Exception")
         //    createForceUpdateDialog()
-        // }
+        //}
 
     }
 
     private fun setupCertStatusView(cert: CertificateSimple) {
+        //val certStatus = viewModel.getCertificateStatus(cert)
         val certStatus = viewModel.getCertificateStatus(cert)
-        // val certStatus = cert.certificateStatus
         if (certStatus !=null) {
             setBackgroundColor(certStatus)
             setPersonDetailsVisibility(certStatus)
@@ -174,7 +181,7 @@ class VerificationFragment : Fragment(), View.OnClickListener {
                 requireContext(), when (certStatus) {
                     CertificateStatus.VALID -> R.drawable.ic_valid_cert
                     CertificateStatus.NOT_VALID_YET -> R.drawable.ic_not_valid_yet
-                    CertificateStatus.PARTIALLY_VALID -> R.drawable.ic_locally_valid
+                    CertificateStatus.PARTIALLY_VALID -> R.drawable.ic_valid_cert
                     CertificateStatus.NOT_GREEN_PASS -> R.drawable.ic_technical_error
                     else -> R.drawable.ic_invalid
                 }
@@ -194,7 +201,7 @@ class VerificationFragment : Fragment(), View.OnClickListener {
                 requireContext(),
                 when (certStatus) {
                     CertificateStatus.VALID -> R.color.green
-                    CertificateStatus.PARTIALLY_VALID -> R.color.blue_bg
+                    CertificateStatus.PARTIALLY_VALID -> R.color.green
                     else -> R.color.red_bg
                 }
             )
